@@ -43,6 +43,15 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>de.tr7zw.changeme.nbtapi</pattern>
+                            <shadedPattern>org.soulsoftware.spigot.Core.NBT</shadedPattern>
+                        </relocation>
+                    </relocations>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
             </plugin>
         </plugins>
         <resources>
@@ -95,6 +104,11 @@
             <artifactId>spigot</artifactId>
             <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>de.tr7zw</groupId>
