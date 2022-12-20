@@ -15,8 +15,6 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.NameHelper;
 import org.reflections.util.QueryFunction;
 import org.reflections.vfs.Vfs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -36,7 +34,6 @@ import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnyParameterAnnotation;
 
 public class Reflections implements NameHelper {
-    public final static Logger log = LoggerFactory.getLogger(Reflections.class);
 
     protected final transient Configuration configuration;
     protected final Store store;
@@ -137,15 +134,13 @@ public class Reflections implements NameHelper {
                                     if (entries != null) collect.get(scanner.index()).addAll(entries);
                                 }
                             } catch (Exception e) {
-                                if (log != null)
-                                    log.trace("could not scan file {} with scanner {}", file.getRelativePath(), scanner.getClass().getSimpleName(), e);
+                                e.printStackTrace();
                             }
                         }
                     }
                 }
             } catch (Exception e) {
-                if (log != null)
-                    log.warn("could not create Vfs.Dir from url. ignoring the exception and continuing", e);
+                e.printStackTrace();
             } finally {
                 if (dir != null) dir.close();
             }
@@ -161,13 +156,6 @@ public class Reflections implements NameHelper {
                                                 Map.Entry::getKey,
                                                 HashMap::new,
                                                 Collectors.mapping(Map.Entry::getValue, Collectors.toSet())))));
-        if (log != null) {
-            int keys = 0, values = 0;
-            for (Map<String, Set<String>> map : storeMap.values()) {
-                keys += map.size();
-                values += map.values().stream().mapToLong(Set::size).sum();
-            }
-        }
         return storeMap;
     }
 

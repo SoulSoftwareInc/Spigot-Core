@@ -4,6 +4,7 @@
 
 package org.soulsoftware.spigot.core.Utils;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
@@ -12,12 +13,15 @@ import de.tr7zw.changeme.nbtapi.NBTListCompound;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
@@ -38,27 +42,35 @@ public class DataManager {
     }
 
     public static ItemStack setCustomSkullTexture(ItemStack head, String id) {
-        if (head != null && !head.getType().isAir())
+        if (VersionManager.isAir(head)) {
             if (hasNBT(head, "SkullOwner")) head = removeNBT(head, "SkullOwner");
+        }
         id = id.replace(":", "");
         String base64 = new String(Base64.getEncoder().encode(String.format("{\"textures\":{\"SKIN\":{\"url\":\"%s" +
                         "\"}}}",
-                "https://textures.minecraft.net/texture/" + id).getBytes()));
+                "http://textures.minecraft.net/texture/" + id).getBytes()));
         Material material = Material.getMaterial("SKULL_ITEM");
         if (material == null) {
-            material = Material.getMaterial("PLAYER_HEAD");
+            head.setType(Material.getMaterial("PLAYER_HEAD"));
+        } else {
+            head.setType(material);
+            head.setDurability((short) SkullType.PLAYER.ordinal());
+            head.setData(material.getNewData((byte) SkullType.PLAYER.ordinal()));
         }
-        head.setType(material);
-        head.setData(new MaterialData(material, (byte) 3));
-        NBTItem nbti = new NBTItem(head);
 
-        NBTCompound skull = nbti.addCompound("SkullOwner");
-        skull.setString("Id", UUID.randomUUID().toString());
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+        profile.getProperties().put("textures", new Property("textures", base64));
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        try {
+            Field profileField = meta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(meta, profile);
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
+            ex.printStackTrace();
+        }
 
-        NBTListCompound texture = skull.addCompound("Properties").getCompoundList("textures").addCompound();
-        texture.setString("Value", base64);
-
-        return nbti.getItem();
+        head.setItemMeta(meta);
+        return head;
     }
 
     public static ItemStack setNBT(ItemStack item, String key, String value) {

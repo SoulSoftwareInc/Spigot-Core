@@ -28,7 +28,16 @@ public class TextUtils {
         rawRoman.put('D',500);
         rawRoman.put('M',1000);
     }
+
+    public static String removeColor(String str) {
+        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&',str));
+    }
     private static String rgbGradient(String str, Color from, Color to, Interpolator interpolator) {
+        try {
+            String methodName = net.md_5.bungee.api.ChatColor.class.getDeclaredMethod("of", Color.class).getName();
+        } catch (NoSuchMethodException e) {
+            return str;
+        }
 
         // interpolate each component separately
         final double[] red = interpolator.interpolate(from.getRed(), to.getRed(), str.length());
