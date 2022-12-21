@@ -12,26 +12,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 import static net.md_5.bungee.api.ChatColor.COLOR_CHAR;
 
 public class TextUtils {
     private static final Map<Character, Integer> rawRoman = new HashMap<>();
     private static final Map<ChatColor, String> replacements = new EnumMap(ChatColor.class);
+
     static {
-        rawRoman.put('I',1);
-        rawRoman.put('V',5);
-        rawRoman.put('X',10);
-        rawRoman.put('L',50);
-        rawRoman.put('C',100);
-        rawRoman.put('D',500);
-        rawRoman.put('M',1000);
+        rawRoman.put('I', 1);
+        rawRoman.put('V', 5);
+        rawRoman.put('X', 10);
+        rawRoman.put('L', 50);
+        rawRoman.put('C', 100);
+        rawRoman.put('D', 500);
+        rawRoman.put('M', 1000);
     }
 
     public static String removeColor(String str) {
-        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&',str));
+        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', str));
     }
+
     private static String rgbGradient(String str, Color from, Color to, Interpolator interpolator) {
         try {
             String methodName = net.md_5.bungee.api.ChatColor.class.getDeclaredMethod("of", Color.class).getName();
@@ -58,8 +59,10 @@ public class TextUtils {
 
         return builder.toString();
     }
+
     /**
      * Converts a hex string to a color. If it can't be converted null is returned.
+     *
      * @param hex (i.e. #CCCCCCFF or CCCCCC)
      * @return Color
      */
@@ -80,12 +83,13 @@ public class TextUtils {
         }
         return null;
     }
+
     /**
      * @param mode T - Quadratic increasing F - Linear
      */
     public static String gradient(String input, Boolean mode, double @Nullable [] portions, Color... colors) {
         Interpolator interpolator;
-        if(mode) interpolator = new Interpolator.Quadratic();
+        if (mode) interpolator = new Interpolator.Quadratic();
         else interpolator = new Interpolator.Linear();
 
         final double[] p;
@@ -113,15 +117,16 @@ public class TextUtils {
         }
         return builder.toString();
     }
+
     public static String toAnsiString(String str) {
         String result = convertRGBColors(str);
         ChatColor[] var6;
         int var5 = (var6 = ChatColor.values()).length;
 
-        for(int var4 = 0; var4 < var5; ++var4) {
+        for (int var4 = 0; var4 < var5; ++var4) {
             ChatColor color = var6[var4];
             if (replacements.containsKey(color)) {
-                result = result.replaceAll("(?i)" + color.toString(), (String)replacements.get(color));
+                result = result.replaceAll("(?i)" + color.toString(), (String) replacements.get(color));
             } else {
                 result = result.replaceAll("(?i)" + color.toString(), "");
             }
@@ -129,11 +134,12 @@ public class TextUtils {
 
         return result + Ansi.ansi().reset().toString();
     }
+
     public static String convertRGBColors(String input) {
         Matcher matcher = Pattern.compile('§' + "x(" + '§' + "[A-F0-9]){6}", 2).matcher(input);
         StringBuffer buffer = new StringBuffer();
 
-        while(matcher.find()) {
+        while (matcher.find()) {
             String s = matcher.group().replace("§", "").replace('x', '#');
             java.awt.Color color = java.awt.Color.decode(s);
             int red = color.getRed();
@@ -146,12 +152,14 @@ public class TextUtils {
         matcher.appendTail(buffer);
         return buffer.toString();
     }
+
     public static String colorize(String text) {
-        if(text==null) return null;
+        if (text == null) return null;
         return ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(text));
     }
+
     public static String translateHexColorCodes(String message) {
-        if(message==null) return null;
+        if (message == null) return null;
         String startTag = "#";
         String endTag = "";
         final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
@@ -167,24 +175,26 @@ public class TextUtils {
         }
         return matcher.appendTail(buffer).toString();
     }
+
     public static String integerToRoman(Integer num) {
 
-        int[] values = {1000,900,500,400,100,90,50,40,10,9,5,4,1};
-        String[] romanLiterals = {"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] romanLiterals = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
         StringBuilder roman = new StringBuilder();
 
-        for(int i=0;i<values.length;i++) {
-            while(num >= values[i]) {
+        for (int i = 0; i < values.length; i++) {
+            while (num >= values[i]) {
                 num -= values[i];
                 roman.append(romanLiterals[i]);
             }
         }
         return roman.toString();
     }
+
     public static Integer romanToInteger(String roman) {
-        roman = roman.replace("IV","IIII").replace("IX","VIIII").replace("XL","XXXX").
-                replace("XC","LXXXX").replace("CD","CCCC").replace("CM","DCCCC");
+        roman = roman.replace("IV", "IIII").replace("IX", "VIIII").replace("XL", "XXXX").
+                replace("XC", "LXXXX").replace("CD", "CCCC").replace("CM", "DCCCC");
         Integer total = 0;
         for (int i = 0; i < roman.length(); i++) total += rawRoman.get(roman.charAt(i));
         return total;

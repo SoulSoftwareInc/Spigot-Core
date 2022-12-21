@@ -8,9 +8,9 @@ import java.util.Map;
 public class Utils {
     public static <K, V> Map<K, V> cloneMap(Map<K, V> map) {
         Map<K, V> clone = new HashMap<>();
-        for(K key : map.keySet()) {
+        for (K key : map.keySet()) {
             V value = map.get(key);
-            if(value instanceof Cloneable) {
+            if (value instanceof Cloneable) {
                 try {
                     V cloned = (V) value.getClass().getMethod("clone").invoke(value);
                     clone.put(key, cloned);
@@ -23,6 +23,7 @@ public class Utils {
         }
         return clone;
     }
+
     public static byte[] mapToBytes(Map<?, ?> map) {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         ObjectOutputStream out = null;
@@ -37,6 +38,7 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
     public static Map<?, ?> bytesToMap(byte[] bytes) {
         ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
         ObjectInputStream in = null;

@@ -5,8 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.soulsoftware.spigot.core.Events.ServerTickEvent;
 
-import java.util.logging.Logger;
-
 public final class Core extends JavaPlugin {
     @Override
     public void onEnable() {
@@ -14,6 +12,6 @@ public final class Core extends JavaPlugin {
         MinecraftVersion.disableBStats();
         MinecraftVersion.disablePackageWarning();
         Bukkit.getScheduler().runTaskTimer(this, () ->
-                Bukkit.getServer().getPluginManager().callEvent(new ServerTickEvent()), 0,0);
+                Bukkit.getServer().getPluginManager().callEvent(new ServerTickEvent()), 0, 0);
     }
 }

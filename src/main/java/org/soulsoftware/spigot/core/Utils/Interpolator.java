@@ -14,6 +14,7 @@ interface Interpolator {
             return results;
         }
     }
+
     class Linear implements Interpolator {
         public double[] interpolate(double from, double to, int max) {
             final double[] res = new double[max];

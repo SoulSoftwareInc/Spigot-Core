@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class VersionManager {
     public static boolean isAir(ItemStack stack) {
-        if(stack==null) return true;
+        if (stack == null) return true;
         return stack.getType().equals(Material.AIR);
     }
 

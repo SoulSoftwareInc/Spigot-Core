@@ -13,8 +13,9 @@ public class Benchmark {
     }
 
     public Long result() {
-        if(startTimeMill == null || endTimeMill == null) throw new SecurityException("Benchmark not started/completed" +
-                " properly!");
+        if (startTimeMill == null || endTimeMill == null)
+            throw new SecurityException("Benchmark not started/completed" +
+                    " properly!");
         return endTimeMill - startTimeMill;
     }
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Joint <T> {
+public class Joint<T> {
     private T key;
     private T value;
 }
