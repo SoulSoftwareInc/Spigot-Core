@@ -1,6 +1,7 @@
 package org.soulsoftware.spigot.core.Utils;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +34,17 @@ public class TextUtils {
         return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', str));
     }
 
+    public static String clean(String str) {
+        return WordUtils.capitalizeFully(str.replace("_"," "));
+    }
+
     private static String rgbGradient(String str, Color from, Color to, Interpolator interpolator) {
         try {
             String methodName = net.md_5.bungee.api.ChatColor.class.getDeclaredMethod("of", Color.class).getName();
         } catch (NoSuchMethodException e) {
             return str;
         }
+        str = ChatColor.stripColor(str);
 
         // interpolate each component separately
         final double[] red = interpolator.interpolate(from.getRed(), to.getRed(), str.length());
@@ -173,7 +179,9 @@ public class TextUtils {
                     + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
             );
         }
-        return matcher.appendTail(buffer).toString();
+        String out =  matcher.appendTail(buffer).toString();
+        if(VersionManager.getServerVersion()<16) return removeColor(out.substring(2));
+        return out;
     }
 
     public static String integerToRoman(Integer num) {

@@ -6,38 +6,48 @@ package org.soulsoftware.spigot.core.Utils;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.MalformedJsonException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import lombok.SneakyThrows;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import sun.jvm.hotspot.debugger.dummy.DummyDebugger;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DataManager {
-    @SneakyThrows
     public static ItemStack setCustomSkullPlayer(ItemStack head, OfflinePlayer player) {
-        URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player.getUniqueId().toString().replace("-",""));
-        InputStreamReader read = new InputStreamReader(url.openStream());
+        URL url = null;
+        try {
+            url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player.getUniqueId().toString().replace("-",""));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        InputStreamReader read = null;
+        try {
+            read = new InputStreamReader(url.openStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         JsonObject textureProperty = JsonParser.parseReader(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
-        read.close();
+        try {
+            read.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         String texture = new String(Base64.getDecoder().decode(textureProperty.get("value").getAsString()));
         texture = JsonParser.parseString(texture).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject().get("url").getAsString().substring(38);
         return setCustomSkullTexture(head, texture);
@@ -47,10 +57,11 @@ public class DataManager {
         try {
             String base64;
             try {
-                JsonReader reader = new JsonReader(new StringReader(new String(Base64.getDecoder().decode(id))));
-                JsonObject textureProperty = JsonParser.parseReader(reader).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject();
+                JsonObject textureProperty = JsonParser.parseString(
+                        new String(Base64.getDecoder().decode(id))
+                ).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject();
                 base64 = id;
-            } catch (IllegalStateException ex) {
+            } catch (Throwable ex) {
                 if (VersionManager.isAir(head)) {
                     if (hasNBT(head, "SkullOwner")) head = removeNBT(head, "SkullOwner");
                 }
@@ -78,13 +89,12 @@ public class DataManager {
             } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
                 ex.printStackTrace();
             }
-
             head.setItemMeta(meta);
             return head;
         } catch (Throwable io) {
             io.printStackTrace();
-            return head;
         }
+        return head;
     }
 
     public static ItemStack setNBT(ItemStack item, String key, String value) {
