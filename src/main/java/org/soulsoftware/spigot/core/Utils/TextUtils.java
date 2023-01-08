@@ -166,21 +166,35 @@ public class TextUtils {
 
     public static String translateHexColorCodes(String message) {
         if (message == null) return null;
-        String startTag = "#";
-        String endTag = "";
-        final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
-        Matcher matcher = hexPattern.matcher(message);
-        StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
-                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
-                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
-                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
-            );
+        String out;
+        if(VersionManager.getServerVersion()<16) {
+            String startTag = "#";
+            String endTag = "";
+            final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
+            Matcher matcher = hexPattern.matcher(message);
+            StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
+            while (matcher.find()) {
+                String group = matcher.group(1);
+                matcher.appendReplacement(buffer, ""
+                );
+            }
+            out = matcher.appendTail(buffer).toString();
+        } else {
+            String startTag = "#";
+            String endTag = "";
+            final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
+            Matcher matcher = hexPattern.matcher(message);
+            StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
+            while (matcher.find()) {
+                String group = matcher.group(1);
+                matcher.appendReplacement(buffer, COLOR_CHAR + "x"
+                        + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
+                        + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
+                        + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
+                );
+            }
+            out = matcher.appendTail(buffer).toString();
         }
-        String out =  matcher.appendTail(buffer).toString();
-        if(VersionManager.getServerVersion()<16) return removeColor(out.substring(2));
         return out;
     }
 
