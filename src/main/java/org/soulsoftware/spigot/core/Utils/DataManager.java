@@ -56,15 +56,15 @@ public class DataManager {
     public static ItemStack setCustomSkullTexture(ItemStack head, String id) {
         try {
             String base64;
+            if (VersionManager.isAir(head)) {
+                if (hasNBT(head, "SkullOwner")) head = removeNBT(head, "SkullOwner");
+            }
             try {
                 JsonObject textureProperty = JsonParser.parseString(
                         new String(Base64.getDecoder().decode(id))
                 ).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject();
                 base64 = id;
             } catch (Throwable ex) {
-                if (VersionManager.isAir(head)) {
-                    if (hasNBT(head, "SkullOwner")) head = removeNBT(head, "SkullOwner");
-                }
                 id = id.replace(":", "");
                 base64 = new String(Base64.getEncoder().encode(String.format("{\"textures\":{\"SKIN\":{\"url\":\"%s" +
                                 "\"}}}",
