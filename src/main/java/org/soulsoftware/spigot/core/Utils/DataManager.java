@@ -16,6 +16,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -37,6 +38,12 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DataManager {
+    public static ItemStack setUnbreakable(ItemStack itemStack, boolean unbreaking) {
+        NBTItem nbtItem = new NBTItem(itemStack);
+        if(unbreaking) nbtItem.setByte("Unbreakable", (byte) 1);
+        else  nbtItem.setByte("Unbreakable", (byte) 0);
+        return nbtItem.getItem();
+    }
     public static ItemStack setCustomSkullPlayer(ItemStack head, OfflinePlayer player) {
         URL url = null;
         try {
@@ -110,6 +117,25 @@ public class DataManager {
         return head;
     }
 
+    public static ItemStack setRawNBT(ItemStack item, String key, Object value) {
+        NBTItem nbti = new NBTItem(item);
+        if(value instanceof String) nbti.setString(key, (String) value);
+        else if (value instanceof Integer) nbti.setInteger(key, (Integer) value);
+        else if (value instanceof Byte) nbti.setByte(key, (Byte) value);
+        else if (value instanceof Boolean) nbti.setBoolean(key, (Boolean) value);
+        else if (value instanceof byte[]) nbti.setByteArray(key, (byte[]) value);
+        else if (value instanceof int[]) nbti.setIntArray(key, (int[]) value);
+        else if (value instanceof Double) nbti.setDouble(key, (Double) value);
+        else if (value instanceof Float) nbti.setFloat(key, (Float) value);
+        else if (value instanceof Enum) nbti.setEnum(key, (Enum<?>) value);
+        else if (value instanceof UUID) nbti.setUUID(key, (UUID) value);
+        else if (value instanceof ItemStack) nbti.setItemStack(key, (ItemStack) value);
+        else if (value instanceof ItemStack[]) nbti.setItemStackArray(key, (ItemStack[]) value);
+        else if (value instanceof Long) nbti.setLong(key, (Long) value);
+        else if (value instanceof Short) nbti.setShort(key, (Short) value);
+
+        return nbti.getItem();
+    }
     public static ItemStack setNBT(ItemStack item, String key, String value) {
         if(VersionManager.getServerVersion()<14) {
             NBTItem nbti = new NBTItem(item);
