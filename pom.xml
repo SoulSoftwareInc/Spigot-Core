@@ -53,6 +53,10 @@
                             <pattern>com.google.gson</pattern>
                             <shadedPattern>org.soulsoftware.spigot.Core.Gson</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.reflections</pattern>
+                            <shadedPattern>org.soulsoftware.spigot.Core.Reflection</shadedPattern>
+                        </relocation>
                     </relocations>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                 </configuration>
