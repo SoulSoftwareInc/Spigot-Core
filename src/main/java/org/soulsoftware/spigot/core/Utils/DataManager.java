@@ -38,6 +38,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DataManager {
+    private static int PERSISTANT_VERSION_LIMIT = 16;
     public static ItemStack setUnbreakable(ItemStack itemStack, boolean unbreaking) {
         NBTItem nbtItem = new NBTItem(itemStack);
         if(unbreaking) nbtItem.setByte("Unbreakable", (byte) 1);
@@ -137,7 +138,7 @@ public class DataManager {
         return nbti.getItem();
     }
     public static ItemStack setNBT(ItemStack item, String key, String value) {
-        if(VersionManager.getServerVersion()<14) {
+        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             nbti.setString(key, value);
             return nbti.getItem();
@@ -152,7 +153,7 @@ public class DataManager {
     }
 
     public static Boolean hasNBT(ItemStack item, String key) {
-        if(VersionManager.getServerVersion()<14) {
+        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             return nbti.hasKey(key);
         } else {
@@ -168,7 +169,7 @@ public class DataManager {
     }
 
     public static HashMap<String, String> getAll(ItemStack item) {
-        if(VersionManager.getServerVersion()<14) {
+        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             HashMap<String, String> map = new HashMap<>();
             for (String key : nbti.getKeys()) {
@@ -190,7 +191,7 @@ public class DataManager {
     }
 
     public static ItemStack removeNBT(ItemStack item, String key) {
-        if(VersionManager.getServerVersion()<14) {
+        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             nbti.removeKey(key);
             return nbti.getItem();
@@ -209,7 +210,7 @@ public class DataManager {
     }
 
     public static String getNBT(ItemStack item, String key) {
-        if(VersionManager.getServerVersion()<14) {
+        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             return nbti.getString(key);
         } else {
