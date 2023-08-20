@@ -1,8 +1,11 @@
 package org.soulsoftware.spigot.core.Utils;
 
 import com.google.common.base.Preconditions;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.Nullable;
 
@@ -161,7 +164,13 @@ public class TextUtils {
 
     public static String colorize(String text) {
         if (text == null) return null;
-        return ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(text));
+        return ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(text.replaceAll(Pattern.quote("\\n"),Pattern.quote("\n"))));
+    }
+
+    public static String placeholders(String input, OfflinePlayer player) {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+            return PlaceholderAPI.setPlaceholders(player, input);
+        return input;
     }
 
     public static String translateHexColorCodes(String message) {
