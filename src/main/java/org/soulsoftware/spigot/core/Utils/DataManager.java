@@ -46,27 +46,35 @@ public class DataManager {
         return nbtItem.getItem();
     }
     public static ItemStack setCustomSkullPlayer(ItemStack head, OfflinePlayer player) {
-        URL url = null;
+        return setCustomSkullTexture(head, getPlayerSkullId(player));
+    }
+    public static String getPlayerSkullId(OfflinePlayer player) {
         try {
-            url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player.getUniqueId().toString().replace("-",""));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            URL url = null;
+            try {
+                url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player.getUniqueId().toString().replace("-", ""));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+            InputStreamReader read = null;
+            try {
+                read = new InputStreamReader(url.openStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            JsonObject textureProperty = JsonParser.parseReader(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+            try {
+                read.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String texture = new String(Base64.getDecoder().decode(textureProperty.get("value").getAsString()));
+            texture = JsonParser.parseString(texture).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject().get("url").getAsString().substring(38);
+            return texture;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return "a4e1da882e434829b96ec8ef242a384a53d89018fa65fee5b37deb04eccbf10e";
         }
-        InputStreamReader read = null;
-        try {
-            read = new InputStreamReader(url.openStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        JsonObject textureProperty = JsonParser.parseReader(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
-        try {
-            read.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        String texture = new String(Base64.getDecoder().decode(textureProperty.get("value").getAsString()));
-        texture = JsonParser.parseString(texture).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject().get("url").getAsString().substring(38);
-        return setCustomSkullTexture(head, texture);
     }
     public static ItemStack setCustomSkullTexture(ItemStack head, String id) {
         try {
@@ -188,6 +196,14 @@ public class DataManager {
             }
             return map;
         }
+    }
+    public static HashMap<String, String> getRawAll(ItemStack item) {
+        NBTItem nbti = new NBTItem(item);
+        HashMap<String, String> map = new HashMap<>();
+        for (String key : nbti.getKeys()) {
+            map.put(key, nbti.getString(key));
+        }
+        return map;
     }
 
     public static ItemStack removeNBT(ItemStack item, String key) {
