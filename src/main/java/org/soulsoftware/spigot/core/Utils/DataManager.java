@@ -197,11 +197,11 @@ public class DataManager {
             return map;
         }
     }
-    public static HashMap<String, String> getRawAll(ItemStack item) {
+    public static HashMap<String, Object> getRawAll(ItemStack item) {
         NBTItem nbti = new NBTItem(item);
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         for (String key : nbti.getKeys()) {
-            map.put(key, nbti.getString(key));
+            map.put(key, nbti.getCompound());
         }
         return map;
     }
