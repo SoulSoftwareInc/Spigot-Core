@@ -1,6 +1,6 @@
 name: SoulCore
 version: '1.0-SNAPSHOT'
 author: SwordOfSouls
-main: org.soulsoftware.spigot.core.Core
+main: org.soulsoftware.spigot.core.SpigotCore
 api-version: 1.13
 prefix: UltimateGUI

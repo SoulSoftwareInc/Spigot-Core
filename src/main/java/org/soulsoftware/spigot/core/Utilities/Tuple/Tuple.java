@@ -1,7 +1,4 @@
-package org.soulsoftware.spigot.core.Utils.Tuple;
-
-import lombok.Getter;
-import lombok.Setter;
+package org.soulsoftware.spigot.core.Utilities.Tuple;
 
 public class Tuple<A, B> {
     private A a;

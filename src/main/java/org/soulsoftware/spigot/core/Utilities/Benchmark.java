@@ -1,4 +1,4 @@
-package org.soulsoftware.spigot.core.Utils;
+package org.soulsoftware.spigot.core.Utilities;
 
 public class Benchmark {
     private Long startTimeMill;

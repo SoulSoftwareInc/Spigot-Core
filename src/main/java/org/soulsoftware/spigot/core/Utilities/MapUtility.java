@@ -1,11 +1,11 @@
-package org.soulsoftware.spigot.core.Utils;
+package org.soulsoftware.spigot.core.Utilities;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Utils {
+public class MapUtility {
     public static <K, V> Map<K, V> cloneMap(Map<K, V> map) {
         Map<K, V> clone = new HashMap<>();
         for (K key : map.keySet()) {

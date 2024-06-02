@@ -2,31 +2,24 @@
  * Copyright (c) SoulSoftware 2022.
  */
 
-package org.soulsoftware.spigot.core.Utils;
+package org.soulsoftware.spigot.core.Utilities;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import junit.runner.Version;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.profile.PlayerProfile;
-import sun.jvm.hotspot.debugger.dummy.DummyDebugger;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -35,19 +28,21 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class DataManager {
     private static int PERSISTANT_VERSION_LIMIT = 16;
+
     public static ItemStack setUnbreakable(ItemStack itemStack, boolean unbreaking) {
         NBTItem nbtItem = new NBTItem(itemStack);
-        if(unbreaking) nbtItem.setByte("Unbreakable", (byte) 1);
-        else  nbtItem.setByte("Unbreakable", (byte) 0);
+        if (unbreaking) nbtItem.setByte("Unbreakable", (byte) 1);
+        else nbtItem.setByte("Unbreakable", (byte) 0);
         return nbtItem.getItem();
     }
+
     public static ItemStack setCustomSkullPlayer(ItemStack head, OfflinePlayer player) {
         return setCustomSkullTexture(head, getPlayerSkullId(player));
     }
+
     public static String getPlayerSkullId(OfflinePlayer player) {
         try {
             URL url = null;
@@ -76,10 +71,11 @@ public class DataManager {
             return "a4e1da882e434829b96ec8ef242a384a53d89018fa65fee5b37deb04eccbf10e";
         }
     }
+
     public static ItemStack setCustomSkullTexture(ItemStack head, String id) {
         try {
             String base64;
-            if (VersionManager.isAir(head)) {
+            if (VersionUtility.isAir(head)) {
                 if (hasRawNBT(head, "SkullOwner")) head = removeRawNBT(head, "SkullOwner");
             }
             try {
@@ -128,7 +124,7 @@ public class DataManager {
 
     public static ItemStack setRawNBT(ItemStack item, String key, Object value) {
         NBTItem nbti = new NBTItem(item);
-        if(value instanceof String) nbti.setString(key, (String) value);
+        if (value instanceof String) nbti.setString(key, (String) value);
         else if (value instanceof Integer) nbti.setInteger(key, (Integer) value);
         else if (value instanceof Byte) nbti.setByte(key, (Byte) value);
         else if (value instanceof Boolean) nbti.setBoolean(key, (Boolean) value);
@@ -145,8 +141,9 @@ public class DataManager {
 
         return nbti.getItem();
     }
+
     public static ItemStack setNBT(ItemStack item, String key, String value) {
-        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
+        if (VersionUtility.getServerVersion() < PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             nbti.setString(key, value);
             return nbti.getItem();
@@ -161,7 +158,7 @@ public class DataManager {
     }
 
     public static Boolean hasNBT(ItemStack item, String key) {
-        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
+        if (VersionUtility.getServerVersion() < PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             return nbti.hasKey(key);
         } else {
@@ -177,7 +174,7 @@ public class DataManager {
     }
 
     public static HashMap<String, String> getAll(ItemStack item) {
-        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
+        if (VersionUtility.getServerVersion() < PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             HashMap<String, String> map = new HashMap<>();
             for (String key : nbti.getKeys()) {
@@ -189,14 +186,15 @@ public class DataManager {
             Set<NamespacedKey> keys = meta.getPersistentDataContainer().getKeys();
             HashMap<String, String> map = new HashMap<>();
 
-            for(NamespacedKey key : keys) {
-                if(meta.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
+            for (NamespacedKey key : keys) {
+                if (meta.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
                     map.put(key.getKey(), meta.getPersistentDataContainer().get(key, PersistentDataType.STRING));
                 }
             }
             return map;
         }
     }
+
     public static HashMap<String, Object> getRawAll(ItemStack item) {
         NBTItem nbti = new NBTItem(item);
         HashMap<String, Object> map = new HashMap<>();
@@ -207,7 +205,7 @@ public class DataManager {
     }
 
     public static ItemStack removeNBT(ItemStack item, String key) {
-        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
+        if (VersionUtility.getServerVersion() < PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             nbti.removeKey(key);
             return nbti.getItem();
@@ -226,7 +224,7 @@ public class DataManager {
     }
 
     public static String getNBT(ItemStack item, String key) {
-        if(VersionManager.getServerVersion()<PERSISTANT_VERSION_LIMIT) {
+        if (VersionUtility.getServerVersion() < PERSISTANT_VERSION_LIMIT) {
             NBTItem nbti = new NBTItem(item);
             return nbti.getString(key);
         } else {

@@ -1,4 +1,4 @@
-package org.soulsoftware.spigot.core.Utils.Reflections;
+package org.soulsoftware.spigot.core.Utilities.Reflections;
 
 import javassist.bytecode.ClassFile;
 import org.reflections.Configuration;

@@ -1,4 +1,4 @@
-package org.soulsoftware.spigot.core.Utils;
+package org.soulsoftware.spigot.core.Utilities;
 
 import com.google.common.base.Preconditions;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import static net.md_5.bungee.api.ChatColor.COLOR_CHAR;
 
-public class TextUtils {
+public class TextUtility {
     private static final Map<Character, Integer> rawRoman = new HashMap<>();
     private static final Map<ChatColor, String> replacements = new EnumMap(ChatColor.class);
 
@@ -38,7 +38,7 @@ public class TextUtils {
     }
 
     public static String clean(String str) {
-        return WordUtils.capitalizeFully(str.replace("_"," "));
+        return WordUtils.capitalizeFully(str.replace("_", " "));
     }
 
     private static String rgbGradient(String str, Color from, Color to, Interpolator interpolator) {
@@ -164,7 +164,7 @@ public class TextUtils {
 
     public static String colorize(String text) {
         if (text == null) return null;
-        return ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(text.replaceAll(Pattern.quote("\\n"),Pattern.quote("\n"))));
+        return ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(text.replaceAll(Pattern.quote("\\n"), Pattern.quote("\n"))));
     }
 
     public static String placeholders(String input, OfflinePlayer player) {
@@ -176,7 +176,7 @@ public class TextUtils {
     public static String translateHexColorCodes(String message) {
         if (message == null) return null;
         String out;
-        if(VersionManager.getServerVersion()<16) {
+        if (VersionUtility.getServerVersion() < 16) {
             String startTag = "#";
             String endTag = "";
             final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
