@@ -10,13 +10,45 @@ public class VersionUtility {
     private final static Double serverVersion;
 
     static {
-        Double sV = 0d;
-        String[] scoreSplit = Bukkit.getServer().getClass().getName().split("\\.")[3].split("_");
-        sV += Integer.parseInt(scoreSplit[1]);
-        if (scoreSplit.length == 3) sV += Integer.parseInt(scoreSplit[2].substring(1)) / 10d;
+        double sV = 0d;
+
+        Exception exception = null;
+        try {
+            String serverVersionString = Bukkit.getBukkitVersion();
+            String versionPart = serverVersionString.split("-")[0];
+
+            String[] versionNumbers = versionPart.split("\\.");
+
+            if (versionNumbers.length >= 2) {
+                int minor = Integer.parseInt(versionNumbers[1]);
+                sV += minor;
+            }
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        if(exception == null) {
+            try {
+                String serverClassName = Bukkit.getServer().getClass().getName();
+                String[] scoreSplit = serverClassName.split("\\.")[3].split("_");
+
+                if (scoreSplit.length >= 2) {
+                    sV += Integer.parseInt(scoreSplit[1]);
+                    if (scoreSplit.length == 3) {
+                        String minorVersion = scoreSplit[2].substring(1);
+                        sV += Integer.parseInt(minorVersion) / 10d;
+                    }
+                }
+            } catch (Exception e) {
+                exception = e;
+            }
+        }
+
+        if (exception != null) {
+            Bukkit.getLogger().severe("Failed to parse server version, defaulting to 0. Error: " + exception.getMessage());
+        }
 
         serverVersion = sV;
-
     }
 
     /**

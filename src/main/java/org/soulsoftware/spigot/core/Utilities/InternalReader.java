@@ -7,12 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class InternalReader {
-    private InternalReader() {
-
-    }
-
-    public String read(String file) {
-        InputStream is = getClass().getClassLoader().getResourceAsStream(file);
+    public static String read(String file) {
+        InputStream is = InternalReader.class.getClassLoader().getResourceAsStream(file);
         return new BufferedReader(
                 new InputStreamReader(is, StandardCharsets.UTF_8))
                 .lines()

@@ -9,14 +9,14 @@ import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.SkullType;
+import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_19_R1.profile.CraftPlayerProfile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,21 +74,6 @@ public class DataManager {
 
     public static ItemStack setCustomSkullTexture(ItemStack head, String id) {
         try {
-            String base64;
-            if (VersionUtility.isAir(head)) {
-                if (hasRawNBT(head, "SkullOwner")) head = removeRawNBT(head, "SkullOwner");
-            }
-            try {
-                JsonObject textureProperty = JsonParser.parseString(
-                        new String(Base64.getDecoder().decode(id))
-                ).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject();
-                base64 = id;
-            } catch (Throwable ex) {
-                id = id.replace(":", "");
-                base64 = new String(Base64.getEncoder().encode(String.format("{\"textures\":{\"SKIN\":{\"url\":\"%s" +
-                                "\"}}}",
-                        "http://textures.minecraft.net/texture/" + id).getBytes()));
-            }
             Material material = Material.getMaterial("SKULL_ITEM");
             if (material == null) {
                 head.setType(Material.getMaterial("PLAYER_HEAD"));
@@ -98,22 +83,52 @@ public class DataManager {
                 head.setData(material.getNewData((byte) SkullType.PLAYER.ordinal()));
             }
 
-            GameProfile profile = new GameProfile(UUID.randomUUID(), UUID.randomUUID().toString());
-            profile.getProperties().put("textures", new Property("textures", base64));
+            GameProfile profile = new GameProfile(UUID.randomUUID(), UUID.randomUUID().toString().substring(0,16));
             SkullMeta meta = (SkullMeta) head.getItemMeta();
-            try {
-                Method setProfile = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
-                setProfile.setAccessible(true);
-                setProfile.invoke(meta, profile);
-            } catch (NoSuchMethodException nsm) {
+            if(meta == null) {
+                return head;
+            }
+
+            if (VersionUtility.getServerVersion() > 1.20) {
+                final var playerProfile = Bukkit.createPlayerProfile(profile.getId());
+                final var textures = playerProfile.getTextures();
+                textures.setSkin(new URL("https://textures.minecraft.net/texture/" + id));
+                playerProfile.setTextures(textures);
+                meta.setOwnerProfile(playerProfile);
+            } else {
+                String base64;
+                if (VersionUtility.isAir(head)) {
+                    if (hasRawNBT(head, "SkullOwner")) head = removeRawNBT(head, "SkullOwner");
+                }
                 try {
-                    Field profileField = meta.getClass().getDeclaredField("profile");
-                    profileField.setAccessible(true);
-                    profileField.set(meta, profile);
-                } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
-                    ex.printStackTrace();
+                    JsonObject textureProperty = JsonParser.parseString(
+                            new String(Base64.getDecoder().decode(id))
+                    ).getAsJsonObject().get("textures").getAsJsonObject().get("SKIN").getAsJsonObject();
+                    base64 = id;
+                } catch (Throwable ex) {
+                    id = id.replace(":", "");
+                    base64 = new String(Base64.getEncoder().encode(String.format("{\"textures\":{\"SKIN\":{\"url\":\"%s" +
+                                    "\"}}}",
+                            "http://textures.minecraft.net/texture/" + id).getBytes()));
+                }
+
+                profile.getProperties().put("textures", new Property("textures", base64));
+
+                try {
+                    Method setProfile = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
+                    setProfile.setAccessible(true);
+                    setProfile.invoke(meta, profile);
+                } catch (NoSuchMethodException nsm) {
+                    try {
+                        Field profileField = meta.getClass().getDeclaredField("profile");
+                        profileField.setAccessible(true);
+                        profileField.set(meta, profile);
+                    } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
+
             head.setItemMeta(meta);
             return head;
         } catch (Throwable io) {

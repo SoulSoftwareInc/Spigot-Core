@@ -4,8 +4,10 @@ import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.soulsoftware.spigot.core.Events.ServerTickEvent;
+import org.soulsoftware.spigot.core.Utilities.VersionUtility;
 
-public final class SpigotCore {
+public class SpigotCore {
+
     /**
      * Call in your plugins {@code onEnable}
      */
@@ -16,4 +18,5 @@ public final class SpigotCore {
         Bukkit.getScheduler().runTaskTimer(plugin, () ->
                 Bukkit.getServer().getPluginManager().callEvent(new ServerTickEvent()), 0, 0);
     }
+
 }

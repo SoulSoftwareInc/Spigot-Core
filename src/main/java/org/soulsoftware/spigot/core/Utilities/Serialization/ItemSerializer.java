@@ -15,6 +15,7 @@ import java.util.Base64;
 import java.util.HashMap;
 
 public class ItemSerializer {
+
     public static String toBase64(String title, Inventory inventory) {
         HashMap<String, Object> data = new HashMap<>();
         data.put("title", title);
