@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("com.gradleup.shadow") version "8.3.5"
+    `maven-publish`
 }
 
 group = "org.soulsoftware.spigot"
@@ -24,8 +25,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT")
-    compileOnly("org.spigotmc:spigot:1.19-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot:1.19.1-R0.1-SNAPSHOT")
 
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.2.0-SNAPSHOT")
@@ -61,6 +62,21 @@ publishing {
             artifactId = "core"
 
             from(components["shadow"])
+        }
+    }
+
+    repositories {
+        mavenLocal()
+        maven {
+            name = "soulsoftwarePrivate"
+            url = uri("https://maven.soulsoftware.dev/private")
+            credentials {
+                username = project.properties["soulsoftwareincPrivateUsername"] as String? ?: System.getenv("SOULSOFTWAREINC_PRIVATE_USERNAME")
+                password = project.properties["soulsoftwareincPrivatePassword"] as String? ?: System.getenv("SOULSOFTWAREINC_PRIVATE_PASSWORD")
+            }
+            authentication {
+                create("basic", BasicAuthentication::class.java)
+            }
         }
     }
 }
